@@ -45,4 +45,8 @@ even nodes only that it is his/her problem and interface will not allow that.
 but that is stupid and not a way to go (what if I need to copy graph but only
 if nodes are even? Then I would be the stupid one, that is what)
 
+### Idea
+forcing implementors to implement their own iterator is probably the best. 
+I will enforce somethig like "is child of random access iterator and mark 
+begin + end as virtual.
 
