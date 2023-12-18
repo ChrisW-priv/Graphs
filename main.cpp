@@ -1,16 +1,22 @@
 #include "src/Graph.hpp"
+#include "src/EdgeList.hpp"
 #include <iostream>
 
 
 int main() {
-    UndirectedRelation r1{0,2};
-    UndirectedRelation r2{2,4};
-    UndirectedRelation r3{4,6};
-    UndirectedRelation r4{6,8};
-    UndirectedRelation r5{8,10};
-    UndirectedRelation r6{10,12};
+    Relation r1{0,2};
+    Relation r2{2,4};
+    Relation r3{4,6};
+    Relation r4{6,8};
+    Relation r5{8,10};
+    Relation r6{10,12};
 
     EdgeList g{ {r1, r2, r3, r4, r5, r6 } };
 
+    std::cout << g << "\n";
+
+    g.remove_vertex(6);
+    std::cout << g << "\n";
+    g.remove_vertex(2);
     std::cout << g << "\n";
 }
