@@ -36,10 +36,13 @@ public:
     }
 
 
-    virtual void remove_vertex(Vertex vertex) {
-        std::copy_if(relations.begin(), relations.end(), relations.begin(),
-                [vertex](Relation relation){ 
-                return relation.v1 == vertex || relation.v2 == vertex; });
+    void remove_vertex(Vertex vertex) {
+        relations.erase(
+                std::remove_if(relations.begin(), relations.end(),
+                    [vertex](Relation relation) {
+                        return (relation.v1 == vertex || relation.v2 == vertex);
+                    }
+                ), relations.end());
     }
 
 
