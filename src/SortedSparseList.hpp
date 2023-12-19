@@ -61,6 +61,17 @@ public:
     }
 
     void insert_relation(Relation relation) {
+        // check if node that is larger than current max node
+        auto v1 = relation.v1;
+        auto v2 = relation.v2;
+        auto max = std::max(v1, v2);
+        auto max_node = starting_position.size() - 1;
+        // if it is larger, resize to new max
+        // and fill the new values with last value of old map
+        if (max > max_node) {
+            starting_position.resize(max, starting_position.back());
+        }
+
         auto found_position = get_relation_iter(relation);
         relations.insert(found_position, relation.v2);
         update_boundaries(relation.v1, 1);
