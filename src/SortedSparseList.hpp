@@ -50,7 +50,6 @@ class SortedSparseList : public Graph<Relation> {
 public:
     SortedSparseList() = default;
     SortedSparseList(std::initializer_list<Relation> list) {
-        set_max_vertex(13);
         for (auto relation : list) {
             insert_relation(relation);
         }

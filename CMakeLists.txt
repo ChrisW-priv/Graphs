@@ -4,5 +4,7 @@ project(GraphInterface)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(main main.cpp 
-    src/Graph.hpp
+    ./src/Graph.hpp
+    ./src/SortedSparseList.hpp
+    ./src/EdgeList.hpp
     )
