@@ -79,22 +79,25 @@ public:
     void remove_relation(Relation relation) {
         auto iter = get_relation_iter(relation);
         relations.erase(iter);
+        update_boundaries(relation.v1, -1);
     }
 
     virtual void remove_vertex(Vertex vertex) {
         // remove entire range of values
-        relations.erase( get_begin_iter(vertex), get_end_iter(vertex));
+        auto begin = get_begin_iter(vertex);
+        auto end = get_end_iter(vertex);
+        relations.erase( begin, end );
+        update_boundaries(vertex, begin - end);
 
         for (Vertex i=0; i<get_vertex_count(); i++) {
             auto begin = get_begin_iter(i);
             auto end = get_end_iter(i);
             auto found = std::upper_bound( begin, end, vertex );
-            if (found != end) 
+            if (found != end) {
                 relations.erase(found);
+                update_boundaries(i, -1);
+            }
         }
-        
-        // remove reference in map
-        starting_position.erase(starting_position.begin() + vertex);
     }
 
     std::set<Relation> get_edges() const {
