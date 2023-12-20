@@ -33,7 +33,7 @@ struct Graph {
 
     virtual void remove_vertex(Vertex) = 0;
 
-    virtual void insert_relation(Relation) = 0;
+    virtual void insert_relation(const Relation&) = 0;
     virtual void remove_relation(Relation) = 0;
 
     virtual std::set<Vertex> get_vertexes() const = 0;
@@ -47,8 +47,8 @@ struct Graph {
         return get_edges().size();
     }
 
-    virtual std::vector<Relation> get_neighbours(Vertex) const = 0;
-    std::size_t get_neighbour_count(Vertex vertex) {
+    virtual std::vector<Vertex> get_neighbours(Vertex vertex) const = 0;
+    std::size_t get_neighbour_count(Vertex vertex) const {
         return get_neighbours(vertex).size();
     }
 

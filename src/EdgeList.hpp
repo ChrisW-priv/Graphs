@@ -26,7 +26,7 @@ public:
         }
     }
 
-    void insert_relation(Relation relation) {
+    void insert_relation(const Relation& relation) {
         relations.push_back(relation);
     }
 
@@ -64,14 +64,15 @@ public:
         return unique_vertexes;
     }
 
-    std::vector<Relation> get_neighbours(Vertex vertex) const {
-        std::vector<Relation> result{};
+    std::vector<Vertex> get_neighbours(Vertex vertex) const {
+        std::vector<Vertex> result{};
         for (auto relation : relations){
             auto v1 = relation.v1;
             auto v2 = relation.v2;
-            if (vertex == v1 || vertex == v2) {
-                result.push_back(relation);
-            }
+            if (vertex == v1)
+                result.push_back(v2);
+            if (vertex == v2)
+                result.push_back(v1);
         }
         return result;
     }

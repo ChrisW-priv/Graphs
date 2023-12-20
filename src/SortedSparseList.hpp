@@ -19,19 +19,19 @@ using Strategy = bool(*)(int, int);
 
 
 class SortedSparseList : public Graph<Relation> {
-    std::vector<Vertex> starting_position{0};
-    std::vector<std::size_t> relations{};
+    std::vector<std::size_t> starting_position{0};
+    std::vector<Vertex> relations{};
 
-    std::size_t get_begin_range(Vertex vertex) const {
-        return starting_position[vertex]; 
+    auto get_begin_iter(Vertex vertex) const {
+        return relations.begin() + starting_position[vertex]; 
     }
-    std::size_t get_end_range(Vertex vertex) const {
-        return starting_position[vertex+1]; 
+    auto get_end_iter(Vertex vertex) const {
+        return relations.begin() + starting_position[vertex+1]; 
     }
     auto get_relation_iter(Vertex v1, Vertex v2) {
-        auto begin = relations.begin() + get_begin_range(v1);
-        auto end = relations.end() + get_end_range(v1);
-        auto found = std::lower_bound( begin, end, v2);
+        auto begin = get_begin_iter(v1);
+        auto end = get_end_iter(v1);
+        auto found = std::upper_bound( begin, end, v2 );
 
         return found;
     }
@@ -55,11 +55,11 @@ public:
         }
     }
 
-    void set_max_vertex(Vertex vertex) {
-        starting_position.resize(vertex);
+    void set_max_vertex(std::size_t vertex) {
+        starting_position.resize(vertex + 1);
     }
 
-    void insert_relation(Relation relation) {
+    void insert_relation(const Relation& relation) {
         // check if node that is larger than current max node
         auto v1 = relation.v1;
         auto v2 = relation.v2;
@@ -68,7 +68,7 @@ public:
         // if it is larger, resize to new max
         // and fill the new values with last value of old map
         if (max > max_node) {
-            starting_position.resize(max, starting_position.back());
+            starting_position.resize(max+2, starting_position.back());
         }
 
         auto found_position = get_relation_iter(relation);
@@ -83,14 +83,12 @@ public:
 
     virtual void remove_vertex(Vertex vertex) {
         // remove entire range of values
-        relations.erase(
-                relations.begin() + get_begin_range(vertex), 
-                relations.end() + get_end_range(vertex));
+        relations.erase( get_begin_iter(vertex), get_end_iter(vertex));
 
         for (Vertex i=0; i<get_vertex_count(); i++) {
-            auto begin = relations.begin() + get_begin_range(i);
-            auto end = relations.end() + get_end_range(i);
-            auto found = std::lower_bound( begin, end, vertex);
+            auto begin = get_begin_iter(i);
+            auto end = get_end_iter(i);
+            auto found = std::upper_bound( begin, end, vertex );
             if (found != end) 
                 relations.erase(found);
         }
@@ -111,9 +109,13 @@ public:
 
     std::set<Vertex> get_vertexes() const {
         std::set<Vertex> unique_vertexes{};
-        for (auto relation : relations) {
-            unique_vertexes.insert(relation);
+        for (auto i = 0; i < starting_position.size()-1; ++i) {
+            if (get_neighbour_count(i) > 0)
+                unique_vertexes.insert(i);
         }
+
+        for (auto v : relations)
+                unique_vertexes.insert(v);
 
         return unique_vertexes;
     }
@@ -122,17 +124,17 @@ public:
         return starting_position.size()-1;
     }
 
-    std::vector<Relation> get_neighbours(Vertex vertex) const {
-        std::vector<Vertex> neighbours(
-                relations.begin() + get_begin_range(vertex), 
-                relations.end() + get_end_range(vertex+1));
 
-        std::vector<Relation> result;
+    std::size_t get_neighbour_count(Vertex vertex) const {
+        return get_end_iter(vertex) - get_begin_iter(vertex);
+    }
 
-        for (const auto &x : neighbours) {
-            result.push_back({vertex, x});
-        }
-        return result;
+    std::vector<Vertex> get_neighbours(Vertex vertex) const {
+        auto begin = get_begin_iter(vertex);
+        auto end = get_end_iter(vertex);
+        std::vector<Vertex> neighbours( begin, end );
+
+        return neighbours;
     }
 };
 
