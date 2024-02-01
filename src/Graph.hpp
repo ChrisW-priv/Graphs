@@ -84,28 +84,31 @@ struct Graph {
 };
 
 
-struct Relation {
-    Vertex v1;
-    Vertex v2;
+template <typename T = void>
+struct Node {
+    std::size_t v1;
+    std::size_t v2;
+    T payload;
 
-    auto operator<=>(const Relation& relation) const = default;
-
-    friend std::ostream& operator<<(std::ostream& stream, const Relation& relation) {
+    auto operator<=>(const Node<T>& relation) const = default;
+    friend std::ostream& operator<<(std::ostream& stream, const Node<T>& relation) {
         stream << "{" << relation.v1 << ", " << relation.v2 << "}";
         return stream;
     }
 };
 
+// Specialization for when T is void
+template <>
+struct Node<void> {
+    std::size_t v1;
+    std::size_t v2;
 
+    auto operator<=>(const Node<void>& relation) const = default;
 
-struct WeightedRelation : public Relation {
-    std::size_t weight;
-
-    friend std::ostream& operator<<(std::ostream& stream, const WeightedRelation& relation) {
-        stream << "{" << relation.v1 << ", " << relation.v2 << ", " << relation.weight << "}";
+    friend std::ostream& operator<<(std::ostream& stream, const Node<void>& relation) {
+        stream << "{" << relation.v1 << ", " << relation.v2 << "}";
         return stream;
     }
 };
-
 
 #endif // !GRAPH_H

@@ -18,6 +18,8 @@ using Vertex = std::size_t;
 using Strategy = bool(*)(int, int); 
 
 
+
+template <typename Relation>
 class SortedSparseList : public Graph<Relation> {
     std::vector<std::size_t> starting_position{0};
     std::vector<Vertex> relations{};
