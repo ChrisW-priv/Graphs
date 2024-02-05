@@ -8,14 +8,15 @@
 #include <tuple>  
 #include <string>   
 
-// Forward declaration of File, Vertex, and Strategy types
+// Forward declaration of File, VertexType, and Strategy types
 using File = std::string;
 //TODO: make Strategy an actual pointer signature!
 using Strategy = bool(*)(int, int); 
 
 
-template <typename Relation>
-class EdgeList : public Graph<Relation> {
+template<typename PayloadType=void, typename VertexType=std::size_t>
+class EdgeList : public Graph<PayloadType, VertexType> {
+    using Relation = Graph<PayloadType, VertexType>::Relation;
     std::vector<Relation> relations{};
 
 public:
@@ -36,7 +37,7 @@ public:
     }
 
 
-    void remove_vertex(Vertex vertex) {
+    void remove_vertex(VertexType vertex) {
         relations.erase(
                 std::remove_if(relations.begin(), relations.end(),
                     [vertex](Relation relation) {
@@ -52,8 +53,8 @@ public:
     }
 
     
-    std::set<Vertex> get_vertexes() const {
-        std::set<Vertex> unique_vertexes{};
+    std::set<VertexType> get_vertexes() const {
+        std::set<VertexType> unique_vertexes{};
         for (auto relation : relations) {
             auto v1 = relation.v1;
             auto v2 = relation.v2;
@@ -64,8 +65,8 @@ public:
         return unique_vertexes;
     }
 
-    std::vector<Vertex> get_neighbours(Vertex vertex) const {
-        std::vector<Vertex> result{};
+    std::vector<VertexType> get_neighbours(VertexType vertex) const {
+        std::vector<VertexType> result{};
         for (auto relation : relations){
             auto v1 = relation.v1;
             auto v2 = relation.v2;

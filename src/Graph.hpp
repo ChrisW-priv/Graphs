@@ -11,15 +11,37 @@
 #include <iostream>
 
 
-// Forward declaration of File, Vertex, and Strategy types
+// Forward declaration of File, VertexType, and Strategy types
 using File = std::string;
-using Vertex = std::size_t;
 //TODO: make Strategy an actual pointer signature!
 using Strategy = bool(*)(int, int); 
 
 
-template<typename Relation>
+template<typename PayloadType=void, typename VertexType=std::size_t>
 struct Graph {
+    template <typename NodePayloadType, typename NodeVertexType>
+    struct Node {
+        NodeVertexType v1;
+        NodeVertexType v2;
+        NodePayloadType payload;
+        auto operator<=>(const Node<NodePayloadType, NodeVertexType>& relation) const = default;
+        friend std::ostream& operator<<(std::ostream& stream, const Node<NodePayloadType, NodeVertexType>& relation) {
+            stream << "{" << relation.v1 << ", " << relation.v2 << "}";
+            return stream;
+        }
+    };
+    // Specialization for when T is void
+    template <typename NodeVertexType>
+    struct Node<void, NodeVertexType> {
+        NodeVertexType v1;
+        NodeVertexType v2;
+        auto operator<=>(const Node<void, NodeVertexType>& relation) const = default;
+        friend std::ostream& operator<<(std::ostream& stream, const Node<void, NodeVertexType>& relation) {
+            stream << "{" << relation.v1 << ", " << relation.v2 << "}";
+            return stream;
+        }
+    };
+    using Relation = Node<PayloadType, VertexType>;
 
     Graph() = default;
     Graph(int);
@@ -31,12 +53,12 @@ struct Graph {
     void import_from(File);
     void save_to(File);
 
-    virtual void remove_vertex(Vertex) = 0;
+    virtual void remove_vertex(VertexType) = 0;
 
     virtual void insert_relation(const Relation&) = 0;
     virtual void remove_relation(Relation) = 0;
 
-    virtual std::set<Vertex> get_vertexes() const = 0;
+    virtual std::set<VertexType> get_vertexes() const = 0;
     virtual std::set<Relation> get_edges() const = 0;
     
     std::size_t get_vertex_count() const {
@@ -47,33 +69,33 @@ struct Graph {
         return get_edges().size();
     }
 
-    virtual std::vector<Vertex> get_neighbours(Vertex vertex) const = 0;
-    std::size_t get_neighbour_count(Vertex vertex) const {
+    virtual std::vector<VertexType> get_neighbours(VertexType vertex) const = 0;
+    std::size_t get_neighbour_count(VertexType vertex) const {
         return get_neighbours(vertex).size();
     }
 
-    std::vector<Relation> single_source_shortest_path(Vertex, Vertex, Strategy);
+    std::vector<Relation> single_source_shortest_path(VertexType, VertexType, Strategy);
 
     Graph<Relation> color_graph();
 
-    std::size_t get_max_flow(Vertex, Vertex);
-    std::tuple<int, std::vector<Relation>> get_max_flow_path(Vertex, Vertex);
+    std::size_t get_max_flow(VertexType, VertexType);
+    std::tuple<int, std::vector<Relation>> get_max_flow_path(VertexType, VertexType);
 
-    std::vector<Vertex> find_eulerian_path();
-    std::vector<Vertex> find_eulerian_circuit();
+    std::vector<VertexType> find_eulerian_path();
+    std::vector<VertexType> find_eulerian_circuit();
 
     std::vector<Relation> find_bridges();
-    std::vector<Vertex> find_articulation_points();
+    std::vector<VertexType> find_articulation_points();
 
     Graph<Relation> calculate_cartesian_product();
     Graph<Relation> calculate_tensor_product();
     
-    friend std::ostream& operator<<(std::ostream& stream, const Graph<Relation>& obj) {
+    friend std::ostream& operator<<(std::ostream& stream, const Graph<PayloadType, VertexType>& obj) {
         auto vertexes = obj.get_vertexes();
 
         stream << "Number of Vertexes: " << obj.get_vertex_count() << '\n';
         for (auto vertex: vertexes) {
-            stream << "Relation of Vertex: " << vertex << " are:\n";
+            stream << "Relations of VertexType: " << vertex << " are:\n";
             for (auto relation : obj.get_neighbours(vertex)) {
                 stream << "\t" << relation << "\n";
             }
@@ -83,32 +105,5 @@ struct Graph {
     }
 };
 
-
-template <typename T = void>
-struct Node {
-    std::size_t v1;
-    std::size_t v2;
-    T payload;
-
-    auto operator<=>(const Node<T>& relation) const = default;
-    friend std::ostream& operator<<(std::ostream& stream, const Node<T>& relation) {
-        stream << "{" << relation.v1 << ", " << relation.v2 << "}";
-        return stream;
-    }
-};
-
-// Specialization for when T is void
-template <>
-struct Node<void> {
-    std::size_t v1;
-    std::size_t v2;
-
-    auto operator<=>(const Node<void>& relation) const = default;
-
-    friend std::ostream& operator<<(std::ostream& stream, const Node<void>& relation) {
-        stream << "{" << relation.v1 << ", " << relation.v2 << "}";
-        return stream;
-    }
-};
 
 #endif // !GRAPH_H
